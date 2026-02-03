@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Instructor AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+
+        .container {
+            width: 700px;
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #334155;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid #dbeafe;
+            font-size: 15px;
+            min-height: 140px;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #6366f1;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #a5b4fc, #99f6e4);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .output {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+
+        .output pre {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .output code {
+            font-family: Consolas, 'Courier New', monospace;
+        }
+
+        .output h1,
+        .output h2,
+        .output h3 {
+            margin-top: 18px;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .output ul,
+        .output ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .output p {
+            margin-bottom: 12px;
+        }
+
+        .output pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .output code {
+            background: #e2e8f0;
+            padding: 3px 6px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e7ff;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .code-wrapper pre {
+            margin-top: 35px;
+        }
+
+
+        .code-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: auto;
+            z-index: 10;
+        }
+
+        .copy-btn:hover {
+            background: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>💻 Coding Instructor AI</h1>
+
+        <textarea id="questionInput" placeholder="Ask your coding question..."></textarea>
+
+        <button id="askButton">
+            <i class="fas fa-paper-plane"></i> Ask AI
+        </button>
+
+        <div class="spinner" id="loadingIndicator"></div>
+
+        <div class="output" id="outputArea">
+            Ask me anything related to programming 🚀
+        </div>
+
+    </div>
+
+    <script>
+        const questionInput = document.getElementById("questionInput");
+        const askButton = document.getElementById("askButton");
+        const outputArea = document.getElementById("outputArea");
+
+        // 🔴🔴🔴🔴     PASTE YOUR API KEY   🔴🔴🔴🔴
+        const GEMINI_API_KEY = "";
+        const MODEL_NAME = "gemini-2.5-flash";
+
+
+        function typeText(element, markdownText, speed = 15) {
+
+            element.innerHTML = "";
+            let index = 0;
+
+            function typing() {
+                if (index < markdownText.length) {
+
+                    const partialText = markdownText.substring(0, index);
+                    element.innerHTML = marked.parse(partialText);
+
+                    index++;
+                    setTimeout(typing, speed);
+
+                } else {
+
+                    element.innerHTML = marked.parse(markdownText);
+                    hljs.highlightAll();
+                    addCopyButtons();
+
+                }
+            }
+
+            typing();
+        }
+
+        function addCopyButtons() {
+
+            document.querySelectorAll("pre").forEach((block) => {
+
+                if (block.parentElement.classList.contains("code-wrapper")) return;
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "code-wrapper";
+
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "copy-btn";
+                copyBtn.innerText = "Copy";
+
+                copyBtn.onclick = () => {
+                    const code = block.innerText;
+                    navigator.clipboard.writeText(code);
+
+                    copyBtn.innerText = "Copied!";
+                    setTimeout(() => copyBtn.innerText = "Copy", 1500);
+                };
+
+                block.parentNode.insertBefore(wrapper, block);
+                wrapper.appendChild(copyBtn);
+                wrapper.appendChild(block);
+
+            });
+
+        }
+
+        questionInput.addEventListener("keydown", function (event) {
+
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                askButton.click();
+            }
+
+        });
+
+        askButton.addEventListener("click", async () => {
+
+            const question = questionInput.value.trim();
+
+            if (!question) {
+                outputArea.innerHTML = "Please enter a coding question.";
+                return;
+            }
+
+            askButton.disabled = true;
+            outputArea.innerHTML = "Thinking...";
+
+            const API_URL =
+                `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
+
+            const requestBody = {
+                contents: [{ role: "user", parts: [{ text: question }] }],
+                systemInstruction: {
+                    parts: [{
+                        text: "You are a Coding Instructor. Answer coding questions simply with Java or C examples."
+                    }]
+                }
+            };
+
+            try {
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                if (!data.candidates) {
+                    outputArea.innerHTML = "API Error: " + (data.error?.message || "Unknown error");
+                    askButton.disabled = false;
+                    return;
+                }
+
+                const answer = data.candidates[0].content.parts[0].text;
+
+                typeText(outputArea, answer);
+
+            } catch (error) {
+
+                outputArea.innerHTML = "Network Error";
+
+            } finally {
+
+                askButton.disabled = false;
+
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>
