@@ -23,19 +23,16 @@
 
         body {
             background: #f4f6fb;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
         }
 
 
         .container {
-            width: 700px;
+            width: 100%;
+            height: 100vh;
             background: white;
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            box-sizing: border-box;
         }
 
 
@@ -82,7 +79,7 @@
             border-radius: 12px;
             background: #ffffff;
             border: 1px solid #e5e7eb;
-            max-height: 420px;
+            height: 50vh;
             overflow-y: auto;
         }
 
@@ -210,7 +207,7 @@
         const outputArea = document.getElementById("outputArea");
 
         // 🔴🔴🔴🔴     PASTE YOUR API KEY   🔴🔴🔴🔴
-        const GEMINI_API_KEY = "";
+        const GEMINI_API_KEY = "AIzaSyAKG3opT-DVPzsMmDVb95luCpnR2fovfHw";
         const MODEL_NAME = "gemini-2.5-flash";
 
 
